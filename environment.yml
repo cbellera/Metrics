@@ -13,3 +13,4 @@ dependencies:
         - sklearn
         - streamlit==0.82.0
         - streamlit_tags
+        - plotly==5.0.0
