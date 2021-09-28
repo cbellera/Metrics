@@ -10,7 +10,6 @@ dependencies:
     - pip:
         - pandas==1.0.1
         - numpy==1.18.1
-	- plotly
         - sklearn
         - sklearn.metrics
         - streamlit==0.82.0
