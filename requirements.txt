@@ -2,6 +2,6 @@ streamlit==0.82.0
 streamlit_tags
 rdkit==2020.09.1.0
 sklearn
-plotly
+plotly==5.0.0
 pathlib
 sklearn.metrics
