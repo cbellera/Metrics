@@ -70,7 +70,7 @@ The tool uses the following packages [RDKIT](https://www.rdkit.org/docs/index.ht
 # st.image(image, caption='Clustering Workflow')
 
 #st.sidebar.header('Molecular descriptors')
-st.sidebar.header('Upload your SMILES')
+st.sidebar.header('Upload your File')
 
 uploaded_file_1 = st.sidebar.file_uploader("Upload a TXT file with one SMILES per line", type=["txt"])
 st.sidebar.markdown("""
