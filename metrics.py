@@ -6,6 +6,7 @@ Created on Mon Sep 14 17:41:37 2020
 """
 
 
+
 import streamlit as st
 import base64
 
@@ -17,7 +18,7 @@ from sklearn.metrics import confusion_matrix
 import math
 import pandas as pd
 import statistics
-import plotly as py
+# import plotly as py
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import numpy as np
@@ -27,8 +28,7 @@ from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from sklearn.metrics import jaccard_score
-
+from sklearn.metrics import matthews_corrcoef
 #---------------------------------#
 # Page layout
 ## Page expands to full width
@@ -61,6 +61,8 @@ st.write("""
 
 Web App to evaluate the perfomance of classificatory models by calculation of AUCROC, BEDROC, Accuracy, F-measure, PR and EF.
 
+Additionaly, using the generated **PPV surfaces** you can select an adequate score threshold for prospective virtual screenings.
+
 The tool uses the following packages [RDKIT](https://www.rdkit.org/docs/index.html), [Scikit-learn](https://scikit-learn.org/stable/), [Plotly](https://plotly.com/python/)
     
 """)
@@ -69,13 +71,15 @@ The tool uses the following packages [RDKIT](https://www.rdkit.org/docs/index.ht
 # image = Image.open('clustering_workflow.png')
 # st.image(image, caption='Clustering Workflow')
 
-#st.sidebar.header('Molecular descriptors')
 st.sidebar.header('Upload your File')
 
-uploaded_file_1 = st.sidebar.file_uploader("Upload a TXT file with one SMILES per line", type=["txt"])
+uploaded_file_1 = st.sidebar.file_uploader("Upload a TXT file with the scores", type=["txt"])
 st.sidebar.markdown("""
-[Example TXT input file](https://raw.githubusercontent.com/cbellera/Metrics/main/example.txt)
+[Example TXT input file](https://raw.githubusercontent.com/cbellera/metrics/main/example_file_metrics.txt)
 """)
+
+st.sidebar.header('SCORE THRESHOLD')    
+threshold_cm = st.sidebar.number_input('Threshold to split between actives and inactives')
 
 st.sidebar.header('BEDROC')    
 alpha_bedroc = st.sidebar.slider('Alpha BEDROC', 5, 100, 20, 5)
@@ -87,8 +91,6 @@ st.sidebar.header('STANDARD DEVIATION')
 repeticiones = st.sidebar.slider('Number of iterations', 100, 1000, 100 , 50)
 particion = st.sidebar.slider('Fraction of evaluation', 0.5, 0.95, 0.85 , 0.05)
 
-st.sidebar.header('CONFUSION MATRIX')    
-threshold_cm = st.sidebar.number_input('Threshold')
 
 
 
@@ -102,8 +104,9 @@ If you are looking to contact us, please
 
 
 def metrics_calculation(uploaded_file_1):
+    
     # Leemos el archivo cargado
-    scores1 = pd.read_csv(uploaded_file_1, sep='\t', delimiter=None, header='infer', names=None)
+    scores1 = uploaded_file_1
     # Lo ordenamos
     scores1.sort_values(by=["score"],axis = 0, ascending = False,inplace = True, na_position ='last')
     
@@ -121,25 +124,24 @@ def metrics_calculation(uploaded_file_1):
     # result = scores1["class"].eq(clases_predichas_serie)
     # proporcion_bc = round(sum(result) / len(result),4) # Numero de compuestos bien clasificados / numero de compuestos del dataset
     
-    st.markdown(":point_down: **Here you can find the % of good classifications with the selected threshold**", unsafe_allow_html=True)
-    # st.write(proporcion_bc)
+    st.markdown(":point_down: **Here you can see the perfomance of the model for the selected threshold**", unsafe_allow_html=True)
     
     metric1 = round(accuracy_score(y_real, clases_predichas_serie),4)
     metric2 = round(balanced_accuracy_score(y_real, clases_predichas_serie),4)
-    metric3 = round(average_precision_score(y_real, clases_predichas_serie),4)
     metric4 = round(f1_score(y_real, clases_predichas_serie),4)
     metric5 = round(precision_score(y_real, clases_predichas_serie),4)
     metric6 = round(recall_score(y_real, clases_predichas_serie),4)
-    metric7 = round(jaccard_score(y_real, clases_predichas_serie),4)
+    metric7 = round(matthews_corrcoef(y_real, clases_predichas_serie),4)
     
-    results = [metric1,metric2,metric3,metric4,metric5,metric6,metric7]
-    metric_name = ["accuracy_score","balanced_accuracy_score","average_precision_score","f1_score","precision_score","recall_score","jaccard_score"]
+    results = [metric1,metric2,metric4,metric5,metric6,metric7]
+    metric_name = ["Accuracy","Balanced accuracy","F-measure","Precision","Recall", "MCC"]
     table_metrics = pd.Series(results,index=metric_name,name="Value")
     st.write(table_metrics)
    
     st.markdown(":point_down: **Here you can find the confusion matrix for the selected threshold**", unsafe_allow_html=True)
     matrix = pd.DataFrame(confusion_matrix(y_real, clases_predichas))
-    matrix=matrix.rename(index={0: 'Predicted Positive', 1:"Predicted Negative"},columns={0:"Real Positive",1:"Real Negative"})
+    # matrix=matrix.rename(index={0: 'Predicted Positive', 1:"Predicted Negative"},columns={0:"Real Positive",1:"Real Negative"})
+    matrix=matrix.rename(index={0: 'Real Negative', 1:"Real Positive"},columns={0:"Predicted Negative",1:"Predicted Positive"})
 
     st.write(matrix)
     
@@ -149,7 +151,8 @@ def metrics_calculation(uploaded_file_1):
     bedrocs=[]
     efs=[]
     prs=[]
-    aupr_max= 1
+
+    # aupr_max= 1
     
     while i <= repeticiones:    # Para hacer el cross validation y poder sacar la desviacion del auc
     
@@ -186,31 +189,36 @@ def metrics_calculation(uploaded_file_1):
     sd_auc = round(statistics.stdev(aucs),4)
     
     bedroc_ok= round(statistics.mean(bedrocs),4)
-    sd_bedroc = round(statistics.stdev(bedrocs)   ,4)
+    sd_bedroc = round(statistics.stdev(bedrocs), 4)
     
-    ef_ok= round(statistics.mean(efs),4)
-    sd_ef = round(statistics.stdev(efs),4)
+    efs1 = [x/efmax for x in efs]
+    ef_ok= round(statistics.mean(efs1),4)
+    if ef_ok > 1:
+        ef_ok = 1.000
+    sd_ef = round(statistics.stdev(efs1),4)
     
     pr_ok= round(statistics.mean(prs),4)
     sd_pr = round(statistics.stdev(prs),4)
     
-    resultado = [auc_ok,bedroc_ok,ef_ok, round(efmax,4), pr_ok,aupr_max]
-    desviaciones = [sd_auc,sd_bedroc, sd_ef, 0, sd_pr, 0]
+    resultado = [auc_ok,bedroc_ok,ef_ok, pr_ok]
+    desviaciones = [sd_auc,sd_bedroc, sd_ef, sd_pr]
     
     final = pd.DataFrame([resultado,desviaciones]).T
     
-    final=final.rename(index={0: 'AUC', 1:"BEDROC_" + str(alpha_bedroc), 2: 'EF_' + str(fraccion_enriquesimiento), 3:'EFmax_' + str(fraccion_enriquesimiento), 4:'AUC_PR', 5:"AUC_PRmax"},columns={0:"Mean",1:"SD"})
+    final=final.rename(index={0: 'AUC', 1:"BEDROC_" + str(alpha_bedroc), 2: 'EFrel_' + str(fraccion_enriquesimiento), 3:'AUC_PR'},columns={0:"Mean",1:"SD"})
     
     st.markdown(":point_down: **Here you can see the calculated metrics**", unsafe_allow_html=True)
-
     st.write(final)
+    # st.markdown(":point_down: **Here you can download this metrics**", unsafe_allow_html=True)
+    st.markdown(filedownload_1(final), unsafe_allow_html=True)
+
     
     return scores1, auc_ok, sd_auc,pr_ok, sd_pr, y_modelo, y_real
 
 def roc_aupr_curves(auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real):
 
     title1= "ROC CURVE " + " " + "(" + "AUCROC = " + str(format(auc_ok, '.4f')) + " ± " + str(format(sd_auc, '.4f')) + ")"
-    title2="PR CURVE " + " " + "(" + "AUCROC = " + str(format(pr_ok, '.4f')) + " ± " + str(format(sd_pr, '.4f')) + ")"
+    title2="PR CURVE " + " " + "(" + "AUPR = " + str(format(pr_ok, '.4f')) + " ± " + str(format(sd_pr, '.4f')) + ")"
     fig = make_subplots(rows=1, cols=2, subplot_titles=(title1,title2))
     
     
@@ -235,11 +243,10 @@ def roc_aupr_curves(auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real):
 
 def ppv_plot(scores1):  
 # importamos los paquetes necesarios:
-    # scores = pd.read_csv(scores1, sep='\t', delimiter=None, header='infer', names=None)  
     y_modelo = list(scores1["score"])
     y_real = list(scores1["class"])
+    
     # Determino la sensibilidad, especificidad y los valores de corte
-    # fpr, tpr, thresholds = roc_curve(y_score= y_modelo, y_true= y_real,drop_intermediate=True)
     fpr, tpr, thresholds = roc_curve(y_score= y_modelo, y_true= y_real,drop_intermediate=False)  
     se = tpr
     sp = 1 - fpr
@@ -322,30 +329,62 @@ def ppv_plot(scores1):
                             zerolinecolor="white"),),
         margin=dict(r=20, l=10, b=10, t=10),
         font=dict(
-            size=16,
+            size=14,
             color="black")
         )
     st.plotly_chart(fig)
     
     st.markdown(":point_down: **Here you can see the table with cutoffs, Se, Sp and PPVs**", unsafe_allow_html=True)
     st.write(tabla_final_1)
+    return tabla_final_1
+
+#%%
+### Exporting files ###
+
+def filedownload(df):
+    csv = df.to_csv(index=False,header=True)
+    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
+    href = f'<a href="data:file/csv;base64,{b64}" download="score_thresholds.csv">Download CSV File with the previous table</a>'
+    return href
+
+def filedownload_1(df):
+    csv = df.to_csv(index=True,header=True)
+    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
+    href = f'<a href="data:file/csv;base64,{b64}" download="model_metrics.csv">Download CSV File with the metrics</a>'
+    return href
 
 
 
 
 
 if uploaded_file_1 is not None:
-    scores1, auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real = metrics_calculation(uploaded_file_1)
+    scores = pd.read_csv(uploaded_file_1, sep='\t', delimiter=None, header='infer', names=None)
+
+    scores1, auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real = metrics_calculation(scores)
     st.write("")
     st.markdown(":point_down: **Here you can see the ROC and AUPR curves**", unsafe_allow_html=True)
     roc_aupr_curves(auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real)
-    
+        
     st.markdown(":point_down: **Here you can see the PPV surface**", unsafe_allow_html=True)
-    ppv_plot(scores1)
+    tabla_final_1 = ppv_plot(scores1)
+    
+    st.markdown(filedownload(tabla_final_1), unsafe_allow_html=True)
     
 else:
     st.info('Awaiting for TXT file to be uploaded.')
- 
+    if st.button('Press to use Example File'):
+        st.write("A file with 1132 predictions (only 22 real actives) have been loaded as example")
+        scores = pd.read_csv("example_file_metrics.txt",sep="\t",header="infer")
+        scores1, auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real = metrics_calculation(scores)
+        st.write("")
+        st.markdown(":point_down: **Here you can see the ROC and AUPR curves**", unsafe_allow_html=True)
+        roc_aupr_curves(auc_ok, sd_auc, pr_ok, sd_pr , y_modelo, y_real)
+            
+        st.markdown(":point_down: **Here you can see the PPV surface**", unsafe_allow_html=True)
+        tabla_final_1 = ppv_plot(scores1)
+        
+        st.markdown(filedownload(tabla_final_1), unsafe_allow_html=True)
+
    
     
 #Footer edit
