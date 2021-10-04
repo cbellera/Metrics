@@ -79,7 +79,7 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.header('SCORE THRESHOLD')    
-threshold_cm = st.sidebar.number_input('Threshold to split between actives and inactives')
+threshold_cm = st.sidebar.number_input('Threshold to split between actives and inactives', value=0.5)
 
 st.sidebar.header('BEDROC')    
 alpha_bedroc = st.sidebar.slider('Alpha BEDROC', 5, 100, 20, 5)
