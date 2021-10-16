@@ -45,12 +45,12 @@ from PIL import Image
 image = Image.open('cropped-header.png')
 st.image(image)
 #####
-c01, c02, c03 = st.columns(3)
+c30, c31, c32 = st.columns(3)
 
-with c01:
+with c30:
     st.write("&nbsp[![Website](https://img.shields.io/badge/website-LIDeB-blue)](https://lideb.biol.unlp.edu.ar)&nbsp[![Twitter Follow](https://img.shields.io/twitter/follow/LIDeB_UNLP?style=social)](https://twitter.com/intent/follow?screen_name=LIDeB_UNLP)")
  
-with c03:   
+with c32:   
         st.markdown("###### Made in 🐍 and[![this is an image link](https://i.imgur.com/iIOA6kU.png)](https://www.streamlit.io/)&nbsp with :heart: by [Lucas Alberca](https://twitter.com/capigol) and [Caro Bellera](https://twitter.com/carobellera)")
 #####
 st.subheader(":pushpin:" "About Us")
