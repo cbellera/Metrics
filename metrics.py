@@ -32,8 +32,7 @@ from sklearn.metrics import matthews_corrcoef
 #---------------------------------#
 # Page layout
 ## Page expands to full width
-st.set_page_config(page_title='LIDEB Tools - Metrics',
-    layout='wide')
+st.set_page_config(page_title='LIDEB Tools - Metrics', page_icon="📏", layout='wide')
 
 ######
 # Function to put a picture as header   
@@ -45,9 +44,15 @@ def img_to_bytes(img_path):
 from PIL import Image
 image = Image.open('cropped-header.png')
 st.image(image)
+#####
+c01, c02, c03 = st.columns(3)
 
-
-st.write("&nbsp[![Website](https://img.shields.io/badge/website-LIDeB-blue)](https://lideb.biol.unlp.edu.ar)&nbsp[![Twitter Follow](https://img.shields.io/twitter/follow/LIDeB_UNLP?style=social)](https://twitter.com/intent/follow?screen_name=LIDeB_UNLP)")
+with c01:
+    st.write("&nbsp[![Website](https://img.shields.io/badge/website-LIDeB-blue)](https://lideb.biol.unlp.edu.ar)&nbsp[![Twitter Follow](https://img.shields.io/twitter/follow/LIDeB_UNLP?style=social)](https://twitter.com/intent/follow?screen_name=LIDeB_UNLP)")
+ 
+with c03:   
+        st.markdown("###### Made in 🐍 and[![this is an image link](https://i.imgur.com/iIOA6kU.png)](https://www.streamlit.io/)&nbsp with :heart: by [Lucas Alberca](https://twitter.com/capigol) and [Caro Bellera](https://twitter.com/carobellera)")
+#####
 st.subheader(":pushpin:" "About Us")
 st.markdown("We are a drug discovery team with an interest in the development of publicly available open-source customizable cheminformatics tools to be used in computer-assisted drug discovery. We belong to the Laboratory of Bioactive Research and Development (LIDeB) of the National University of La Plata (UNLP), Argentina. Our research group is focused on computer-guided drug repurposing and rational discovery of new drug candidates to treat epilepsy and neglected tropical diseases.")
 
@@ -387,34 +392,5 @@ else:
 
    
     
-#Footer edit
-
-footer="""<style>
-a:link , a:visited{
-color: blue;
-background-color: transparent;
-text-decoration: underline;
-}
-a:hover,  a:active {
-color: red;
-background-color: transparent;
-text-decoration: underline;
-}
-.footer {
-position: fixed;
-left: 0;
-bottom: 0;
-width: 100%;
-background-color: white;
-color: black;
-text-align: center;
-}
-</style>
-<div class="footer">
-<p>Made in  🐍 and <img style='display: ; ' href="https://streamlit.io" src="https://i.imgur.com/iIOA6kU.png" target="_blank"></img> Developed with ❤️ by <a style='display: ; text-align: center' href="https://twitter.com/capigol" target="_blank">Lucas Alberca</a> and <a style='display: ; text-align: center' href="https://twitter.com/carobellera" target="_blank">Caro Bellera</a> for <a style='display:; text-align: center;' href="https://lideb.biol.unlp.edu.ar/" target="_blank">LIDeB</a></p>
-</div>
-"""
-st.markdown(footer,unsafe_allow_html=True)
-
 
     
