@@ -5,3 +5,4 @@ sklearn
 plotly==5.0.0
 pathlib
 sklearn.metrics
+protobuf~=3.19.0
