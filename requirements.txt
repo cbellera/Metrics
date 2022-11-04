@@ -1,8 +1,7 @@
 streamlit
 streamlit_tags
-rdkit==2020.09.1.0
-sklearn
+rdkit-pypi
+scikit-learn
 plotly==5.0.0
 pathlib
-sklearn.metrics
 protobuf~=3.19.0
