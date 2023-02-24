@@ -45,10 +45,10 @@ from PIL import Image
 image = Image.open('cropped-header.png')
 st.image(image)
 #####
-st.write("&nbsp[![Website](https://img.shields.io/badge/website-LIDeB-blue)](https://lideb.biol.unlp.edu.ar)&nbsp[![Twitter Follow](https://img.shields.io/twitter/follow/LIDeB_UNLP?style=social)](https://twitter.com/intent/follow?screen_name=LIDeB_UNLP)")
-st.markdown("###### Made in 🐍 and [![this is an image link](https://i.imgur.com/iIOA6kU.png)](https://www.streamlit.io/)&nbsp with :heart: by [Lucas Alberca](https://twitter.com/capigol) and [Caro Bellera](https://twitter.com/carobellera)")
+st.write("[![Website](https://img.shields.io/badge/website-LIDeB-blue)](https://lideb.biol.unlp.edu.ar)[![Twitter Follow](https://img.shields.io/twitter/follow/LIDeB_UNLP?style=social)](https://twitter.com/intent/follow?screen_name=LIDeB_UNLP)")
+st.markdown("###### Made in 🐍 and [![this is an image link](https://i.imgur.com/iIOA6kU.png)](https://www.streamlit.io/) with :heart: by [Lucas Alberca](https://twitter.com/capigol) and [Caro Bellera](https://twitter.com/carobellera)")
 #####
-st.subheader(":pushpin:" "About Us")
+st.subheader(":pushpin: About Us")
 st.markdown("We are a drug discovery team with an interest in the development of publicly available open-source customizable cheminformatics tools to be used in computer-assisted drug discovery. We belong to the Laboratory of Bioactive Research and Development (LIDeB) of the National University of La Plata (UNLP), Argentina. Our research group is focused on computer-guided drug repurposing and rational discovery of new drug candidates to treat epilepsy and neglected tropical diseases.")
 
 
