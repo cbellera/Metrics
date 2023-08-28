@@ -191,11 +191,11 @@ def metrics_calculation(uploaded_file_1):
     bedroc_ok= round(statistics.mean(bedrocs),4)
     sd_bedroc = round(statistics.stdev(bedrocs), 4)
     
-    efs1 = [x/efmax for x in efs]
-    ef_ok= round(statistics.mean(efs1),4)
-    if ef_ok > 1:
-        ef_ok = 1.000
-    sd_ef = round(statistics.stdev(efs1),4)
+    #efs1 = [x/efmax for x in efs]
+    ef_ok= round(statistics.mean(efs),4)
+    #if ef_ok > 1:
+    #    ef_ok = 1.000
+    sd_ef = round(statistics.stdev(efs),4)
     
     pr_ok= round(statistics.mean(prs),4)
     sd_pr = round(statistics.stdev(prs),4)
