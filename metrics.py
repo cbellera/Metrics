@@ -205,7 +205,7 @@ def metrics_calculation(uploaded_file_1):
     
     final = pd.DataFrame([resultado,desviaciones]).T
     
-    final=final.rename(index={0: 'AUC', 1:"BEDROC_" + str(alpha_bedroc), 2: 'EFrel_' + str(fraccion_enriquesimiento), 3:'AUC_PR'},columns={0:"Mean",1:"SD"})
+    final=final.rename(index={0: 'AUC', 1:"BEDROC_" + str(alpha_bedroc), 2: 'EF_' + str(fraccion_enriquesimiento), 3:'AUC_PR'},columns={0:"Mean",1:"SD"})
     
     st.markdown(":point_down: **Here you can see the calculated metrics**", unsafe_allow_html=True)
     st.write(final)
